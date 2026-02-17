@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := LoadCellV1
+BUILD_ARTIFACT_NAME := LoadCellV10
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-LoadCellV1.elf \
+LoadCellV10.elf \
 
 MAP_FILES += \
-LoadCellV1.map \
+LoadCellV10.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-LoadCellV1.list \
+LoadCellV10.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: LoadCellV1.elf secondary-outputs
+main-build: LoadCellV10.elf secondary-outputs
 
 # Tool invocations
-LoadCellV1.elf LoadCellV1.map: $(OBJS) $(USER_OBJS) C:\Users\Hkn\STM32CubeIDE\workspace_1.18.1\LoadCellV1\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "LoadCellV1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Hkn\STM32CubeIDE\workspace_1.18.1\LoadCellV1\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="LoadCellV1.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+LoadCellV10.elf LoadCellV10.map: $(OBJS) $(USER_OBJS) C:\Users\Hkn\STM32CubeIDE\workspace_1.18.1\LoadCellv1\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "LoadCellV10.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Hkn\STM32CubeIDE\workspace_1.18.1\LoadCellv1\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="LoadCellV10.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,14 +70,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-LoadCellV1.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "LoadCellV1.list"
+LoadCellV10.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "LoadCellV10.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) LoadCellV1.elf LoadCellV1.list LoadCellV1.map default.size.stdout
+	-$(RM) LoadCellV10.elf LoadCellV10.list LoadCellV10.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
