@@ -11,6 +11,9 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>  // sprintf fonksiyonu için gerekli
 #include "lcd_i2c.h" // Yeni kütüphaneyi ekledik
+
+#include "ssd1306.h"       // lcd_i2c.h yerine bunu ekledik
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -142,12 +145,28 @@ int main(void)
 	MX_TIM2_Init();
 	/* USER CODE BEGIN 2 */
 
+	/*
 	lcd_init();
 	lcd_clear(); // Ekranın tamamını temizler ve imleci (0,0) konumuna getirir.
 	lcd_put_cur(0, 0);
 	lcd_send_string("Sistem Aciliyor");
 	HAL_Delay(1000);
 	lcd_send_cmd(0x01); // Ekranı temizle
+	 */
+
+	/* --- BAŞLANGIÇ EKRANI --- */
+	ssd1306_Fill(Black);
+
+	// "System" kelimesini ortalayalım (X=40 civarı, Y=2 üst satır)
+	ssd1306_SetCursor(40, 8);
+	ssd1306_WriteString("System", Font_7x10, White);
+
+	// "Starting" kelimesini ortalayalım (X=32 civarı, Y=18 alt satır)
+	ssd1306_SetCursor(32, 24);
+	ssd1306_WriteString("Starting", Font_7x10, White);
+
+	ssd1306_UpdateScreen();
+	HAL_Delay(500); // Yazının okunması için 2 saniye bekle
 
 	HAL_TIM_Base_Start_IT(&htim6); // Kesmeli modda başlat (IT takısı önemli)
 	HAL_TIM_Base_Start(&htim2); // TIM2 donanım sayacını başlat
@@ -223,7 +242,9 @@ int main(void)
 			    long ortalama_raw = hx711_toplam / 5;
 			    son_agirlik_ortalamasi = (float)ortalama_raw * kalibrasyon_faktoru;
 
+
 			    /* --- 4. GRUP: EKRAN GÜNCELLEME (LCD) --- */
+			    /*
 			    // lcd_clear() kullanmıyoruz, sadece imleci başa alıyoruz (Daha stabil görüntü)
 			    lcd_put_cur(0, 0);
 			    //sprintf(lcd_buffer, "%5.1fg %5.1fcm/s", son_agirlik_ortalamasi, anlik_hiz);
@@ -234,8 +255,42 @@ int main(void)
 			    //sprintf(lcd_buffer, "B: %8.2f m  ", toplam_uzunluk);
 			    sprintf(lcd_buffer, "%4.1fcm/s %6.2fm", anlik_hiz, toplam_uzunluk);
 			    lcd_send_string(lcd_buffer);
+			    */
+
+			    /* --- 4. GRUP: EKRAN GÜNCELLEME (OLED) --- */
+			    ssd1306_Fill(Black); // Ekranı (bufferı) temizle
+
+			    // İlk satır: Gram ve Hz
+			    /* --- 1. SATIR: Ağırlık ve Frekans (Sağa Yasla) --- */
+			    sprintf(lcd_buffer, "%5.1fg", son_agirlik_ortalamasi);
+			    int agirlik_genisligi = strlen(lcd_buffer) * 10;
+			    int agirlik_x_baslangic = 128 - agirlik_genisligi - 2;
+			    if(agirlik_x_baslangic < 0) agirlik_x_baslangic = 0;
+			    ssd1306_SetCursor(agirlik_x_baslangic, 4);
+			    ssd1306_WriteString(lcd_buffer, Font_7x10, White);
+
+			    /* --- Hız İçin Sağa Yaslama (Tam Sayı) --- */
+			    sprintf(lcd_buffer, "%luHz %ucm/s", (unsigned long)pulse_sayisi, (unsigned int)anlik_hiz);
+			    int hizi_genisligi = strlen(lcd_buffer) * 10;
+			    int hizi_x_baslangic = 128 - hizi_genisligi - 2;
+			    if(hizi_x_baslangic < 0) hizi_x_baslangic = 0;
+			    ssd1306_SetCursor(hizi_x_baslangic, 14);
+			    ssd1306_WriteString(lcd_buffer, Font_7x10, White);
+
+			    /* --- Metre İçin Sağa Yaslama --- */
+			    sprintf(lcd_buffer, "%6.1fm", toplam_uzunluk);
+			    int metre_genisligi = strlen(lcd_buffer) * 10;
+			    ssd1306_SetCursor(128 - metre_genisligi, 24);
+			    ssd1306_WriteString(lcd_buffer, Font_7x10, White);
+
+
+
+			    //ssd1306_WriteString("ABC abc", Font_7x10, White);
+			    // Tamponu ekrana gönder
+			    ssd1306_UpdateScreen();
 
 			    /* --- 5. GRUP: SIFIRLAMA VE HAZIRLIK --- */
+
 			    hx711_toplam = 0;
 			    okuma_sayaci = 0;
 			}
