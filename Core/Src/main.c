@@ -155,6 +155,7 @@ int main(void)
 	 */
 
 	/* --- BAŞLANGIÇ EKRANI --- */
+	ssd1306_Init();
 	ssd1306_Fill(Black);
 
 	// "System" kelimesini ortalayalım (X=40 civarı, Y=2 üst satır)
